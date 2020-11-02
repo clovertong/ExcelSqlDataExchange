@@ -165,8 +165,9 @@
         <DockPanel HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" Margin="10,0,0,0" Style="{StaticResource dockPanel1}"  >
             <Label Margin="5 5 5 0"  Content="Search By" Style="{StaticResource Label}"/>
             <ComboBox Name="SelectionOption" Margin="5 5 5 5"  SelectedValuePath="Content"  Text="{Binding SearchKeyWord,Mode=TwoWay}" Width="155"   >
-                <ComboBoxItem Content="Equipment ID"/>
+                <ComboBoxItem Content="EquipmentID"/>
                 <ComboBoxItem Content="Building"/>
+                <ComboBoxItem Content="EquipmentSystem"/>
             </ComboBox>
             <Label Margin="40 5 5 0"  Content="Value" Style="{StaticResource Label}"/>
             <TextBox Margin="0 5 5 5"  x:Name="Building" Text="{Binding SerachValue, Mode=TwoWay}"  Width="114" />
@@ -191,7 +192,7 @@
             <Label Content="ID" Style="{StaticResource LabelLight}"/>
             <Label Content="Name" Style="{StaticResource LabelLight}"/>
             <Label Content="Type" Style="{StaticResource LabelLight}"/>
-            <Label Content="Bar Code" Style="{StaticResource LabelLight}"/>
+            <Label Content="System" Style="{StaticResource LabelLight}"/>
         </StackPanel>
         <StackPanel Grid.Row="3" Grid.Column="1"   Margin="10 5 10 0" Style="{StaticResource Panel2}">
             <CheckBox x:Name="IDCheck" Margin=" 0 5 0 0"  IsChecked="{Binding IDCheck,Mode=TwoWay}" />

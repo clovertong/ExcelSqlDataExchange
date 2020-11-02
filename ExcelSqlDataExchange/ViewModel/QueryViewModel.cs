@@ -469,18 +469,29 @@ namespace ExcelSqlDataExchange.ViewModel
 
         #endregion
 
+        #region Window
+        private Guid _viewId;
+
+        public Guid ViewID
+        {
+            get { return _viewId; }
+        }
+
+        #endregion
+
         public QueryViewModel()
         {
             modelView = new ModelView();
             Export = new DelegateCommand(ExportAction);
             DataGrid.Clear();
+            _viewId = Guid.NewGuid();
         }
 
         private void ExportAction()
         {
             try
             {
-            Equipmentlist.Clear();
+                Equipmentlist.Clear();
             using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Helper.CnnVal("AssetDB")))
             {
                 if (ExportOption == "Export all the Data")
@@ -500,48 +511,12 @@ namespace ExcelSqlDataExchange.ViewModel
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
+                WindowManager.CloseWindow(ViewID);
                 throw;
             }
         }
 
-        private void FilterBySelection(IDbConnection connection)
-        {
-           // columnFilter = "equipmentId,building";
-            var columnFilterList = new List<string>();
-            if (IDCheck) columnFilterList.Add("equipmentId");
-            if (NameCheck) columnFilterList.Add("equimentName");
-            if (BarCodeCheck) columnFilterList.Add("barCode");
-            if (TypeCheck) columnFilterList.Add("equipmentType");
 
-            if (BuildingCheck) columnFilterList.Add("building");
-            if (LevelCheck) columnFilterList.Add("floor");
-            if (RoomCheck) columnFilterList.Add("room");
-            if (ZoneCheck) columnFilterList.Add("zone");
-
-            if (DocLinkCheck) columnFilterList.Add("docLink");
-            if (PhotoLinkCheck) columnFilterList.Add("docPhoto");
-
-            if (ClassificationCheck) columnFilterList.Add("classification");
-            if (MaterialTypeCheck) columnFilterList.Add("materialType");
-            if (ConsequencePriorityCheck) columnFilterList.Add("consequencePriority");
-            if (OperationStatusCheck) columnFilterList.Add("opeationStatus");
-
-            if (ManufacturerCheck) columnFilterList.Add("manufacturer");
-            if (YearCheck) columnFilterList.Add("year");
-            if (DegradationInforCheck) columnFilterList.Add("degradationInfo");
-            if (DetailCheck) columnFilterList.Add("detail");
-
-            if (InspectionStatusCheck) columnFilterList.Add("inspectionStatus");
-            if (YearCheck) columnFilterList.Add("alarmType");
-            if (DegradationInforCheck) columnFilterList.Add("collectedBy");
-            if (DetailCheck) columnFilterList.Add("collectedOn");
-            if (YearCheck) columnFilterList.Add("notes");
-            if (DegradationInforCheck) columnFilterList.Add("inspectionPhotoLink");
-            if (DetailCheck) columnFilterList.Add("attachmentLink");
-
-            columnFilter = string.Join(",", columnFilterList);
-            Equipmentlist = connection.Query<Equipment>($"select {columnFilter} from EquipmentList where {SearchKeyWord} = '{ SerachValue }'").ToList();//direct call Sql
-        }
         private void LinkToDataGrid()
         {
             DataGrid.Clear();
@@ -557,7 +532,7 @@ namespace ExcelSqlDataExchange.ViewModel
             xlSheet.Cell(1, 1).Value = "Genreal Information";
             xlSheet.Cell(2, 1).Value = "ID";
             xlSheet.Cell(2, 2).Value = "Name";
-            xlSheet.Cell(2, 3).Value = "Bar Code";
+            xlSheet.Cell(2, 3).Value = "System";
             xlSheet.Cell(2, 4).Value = "Type";
 
             xlSheet.Cell(1, 5).Value = "Location";
@@ -590,13 +565,14 @@ namespace ExcelSqlDataExchange.ViewModel
             xlSheet.Cell(2, 23).Value = "Notes";
             xlSheet.Cell(2, 24).Value = "Photo Link";
             xlSheet.Cell(2, 25).Value = "Attachment Link";
-        #endregion
+            #endregion
 
+            var lastRow = 0;
             for (int i = 0; i < Equipmentlist.Count; i++)
             {
                 xlSheet.Cell(i + 3, 1).Value = Equipmentlist[i].equipmentId;
-                xlSheet.Cell(i + 3, 2).Value = Equipmentlist[i].equimentName;
-                xlSheet.Cell(i + 3, 3).Value = Equipmentlist[i].barCode;
+                xlSheet.Cell(i + 3, 2).Value = Equipmentlist[i].equipmentName;
+                xlSheet.Cell(i + 3, 3).Value = Equipmentlist[i].equipmentSystem;
                 xlSheet.Cell(i + 3, 4).Value = Equipmentlist[i].equipmentType;
 
                 xlSheet.Cell(i + 3, 5).Value = Equipmentlist[i].building;
@@ -606,6 +582,11 @@ namespace ExcelSqlDataExchange.ViewModel
 
                 xlSheet.Cell(i + 3, 9).Value = Equipmentlist[i].docLink;
                 xlSheet.Cell(i + 3, 10).Value = Equipmentlist[i].docPhoto;
+
+                if (Equipmentlist[i].docLink != string.Empty)
+                { xlSheet.Cell(i + 3, 9).Hyperlink = new XLHyperlink(@Equipmentlist[i].docLink); }
+                if (Equipmentlist[i].docPhoto != string.Empty)
+                { xlSheet.Cell(i + 3, 10).Hyperlink = new XLHyperlink(@Equipmentlist[i].docPhoto); }
 
                 xlSheet.Cell(i + 3, 11).Value = Equipmentlist[i].classification;
                 xlSheet.Cell(i + 3, 12).Value = Equipmentlist[i].materialType;
@@ -622,14 +603,84 @@ namespace ExcelSqlDataExchange.ViewModel
                 xlSheet.Cell(i + 3, 21).Value = Equipmentlist[i].collectedBy;
                 xlSheet.Cell(i + 3, 22).Value = Equipmentlist[i].collectedOn;
                 xlSheet.Cell(i + 3, 23).Value = Equipmentlist[i].notes;
-                xlSheet.Cell(i + 3, 24).Value = Equipmentlist[i].inspectionPhotoLink;
-                xlSheet.Cell(i + 3, 23).Value = Equipmentlist[i].attachmentLink;
 
+                xlSheet.Cell(i + 3, 24).Value = Equipmentlist[i].inspectionPhotoLink;
+                xlSheet.Cell(i + 3, 25).Value = Equipmentlist[i].attachmentLink;
+
+                if (Equipmentlist[i].inspectionPhotoLink != string.Empty)
+                { xlSheet.Cell(i + 3, 24).Hyperlink = new XLHyperlink(@Equipmentlist[i].inspectionPhotoLink); }
+                if (Equipmentlist[i].attachmentLink != string.Empty)
+                { xlSheet.Cell(i + 3, 25).Hyperlink = new XLHyperlink(@Equipmentlist[i].attachmentLink); }
+                lastRow = i + 3;
             }
+            ExcelStyle(xlSheet,lastRow);
             var folderPath = SaveFile();
             xlWorkbook.SaveAs(folderPath + "/" + "EquipmentListFromSql"+ ".xlsx");
         }
 
+        private void ExcelStyle(IXLWorksheet xlSheet,int lastRow)
+        {
+            var range1 = xlSheet.Range("A1:D1");
+            var range2 = xlSheet.Range("E1:H1");
+            var range3 = xlSheet.Range("I1:L1");
+            var range4 = xlSheet.Range("M1:N1");
+            var range5 = xlSheet.Range("O1:R1");
+            var range6 = xlSheet.Range("S1:Y1");
+
+            range1.Merge().Style.Font.SetBold().Font.FontSize = 14;
+            range2.Merge().Style.Font.SetBold().Font.FontSize = 14;
+            range3.Merge().Style.Font.SetBold().Font.FontSize = 14;
+            range4.Merge().Style.Font.SetBold().Font.FontSize = 14;
+            range5.Merge().Style.Font.SetBold().Font.FontSize = 14;
+            range6.Merge().Style.Font.SetBold().Font.FontSize = 14;
+
+            var rangeString = $"A1:Y{lastRow}";
+            xlSheet.Range(rangeString).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+            xlSheet.Range(rangeString).Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+            xlSheet.Range(rangeString).Style.Border.OutsideBorder = XLBorderStyleValues.Thick;
+            xlSheet.Range(rangeString).Style.Border.LeftBorder = XLBorderStyleValues.Thin;
+            xlSheet.Range(rangeString).Style.Border.RightBorder = XLBorderStyleValues.Thin;
+            xlSheet.Range(rangeString).Style.Border.TopBorder = XLBorderStyleValues.Thin;
+        }
+
+        private void FilterBySelection(IDbConnection connection)
+        {
+            // columnFilter = "equipmentId,building";
+            var columnFilterList = new List<string>();
+            if (IDCheck) columnFilterList.Add("equipmentId");
+            if (NameCheck) columnFilterList.Add("equipmentName");
+            if (BarCodeCheck) columnFilterList.Add("equipmentSystem");
+            if (TypeCheck) columnFilterList.Add("equipmentType");
+
+            if (BuildingCheck) columnFilterList.Add("building");
+            if (LevelCheck) columnFilterList.Add("floor");
+            if (RoomCheck) columnFilterList.Add("room");
+            if (ZoneCheck) columnFilterList.Add("zone");
+
+            if (DocLinkCheck) columnFilterList.Add("docLink");
+            if (PhotoLinkCheck) columnFilterList.Add("docPhoto");
+
+            if (ClassificationCheck) columnFilterList.Add("classification");
+            if (MaterialTypeCheck) columnFilterList.Add("materialType");
+            if (ConsequencePriorityCheck) columnFilterList.Add("consequencePriority");
+            if (OperationStatusCheck) columnFilterList.Add("opeationStatus");
+
+            if (ManufacturerCheck) columnFilterList.Add("manufacturer");
+            if (YearCheck) columnFilterList.Add("year");
+            if (DegradationInforCheck) columnFilterList.Add("degradationInfo");
+            if (DetailCheck) columnFilterList.Add("detail");
+
+            if (InspectionStatusCheck) columnFilterList.Add("inspectionStatus");
+            if (YearCheck) columnFilterList.Add("alarmType");
+            if (DegradationInforCheck) columnFilterList.Add("collectedBy");
+            if (DetailCheck) columnFilterList.Add("collectedOn");
+            if (YearCheck) columnFilterList.Add("notes");
+            if (DegradationInforCheck) columnFilterList.Add("inspectionPhotoLink");
+            if (DetailCheck) columnFilterList.Add("attachmentLink");
+
+            columnFilter = string.Join(",", columnFilterList);
+            Equipmentlist = connection.Query<Equipment>($"select {columnFilter} from EquipmentList where {SearchKeyWord} = '{ SerachValue }'").ToList();//direct call Sql
+        }
         private void SaveToExcelByFilter()
         {
             var xlWorkbook = new XLWorkbook();
@@ -645,8 +696,8 @@ namespace ExcelSqlDataExchange.ViewModel
             {
                 var columnCount = 0;
                 if (IDCheck){ columnCount++;xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].equipmentId;}
-                if (NameCheck) { columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].equimentName; }
-                if (BarCodeCheck) { columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].barCode; }
+                if (NameCheck) { columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].equipmentName; }
+                if (BarCodeCheck) { columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].equipmentSystem; }
                 if (TypeCheck) { columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].equipmentType; }
 
                 if (BuildingCheck) {columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].building;}
@@ -675,6 +726,8 @@ namespace ExcelSqlDataExchange.ViewModel
                 if (InspectPhotoCheck) { columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].inspectionPhotoLink; }
                 if (AttachmentLinkCheck) { columnCount++; xlSheet.Cell(i + 2, columnCount).Value = Equipmentlist[i].attachmentLink; }
             }
+
+
             var folderPath = SaveFile();
             xlWorkbook.SaveAs(folderPath + "/" + "EquipmentListFromSql_Selection" + ".xlsx");
         }

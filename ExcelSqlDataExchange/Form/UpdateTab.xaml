@@ -180,7 +180,7 @@
             <Label Content="ID" Style="{StaticResource LabelLight}"/>
             <Label Content="Name" Style="{StaticResource LabelLight}"/>
             <Label Content="Type" Style="{StaticResource LabelLight}"/>
-            <Label Content="Bar Code" Style="{StaticResource LabelLight}"/>
+            <Label Content="System" Style="{StaticResource LabelLight}"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="1"  Margin="10 5 10 0" Style="{StaticResource Panel2}">
             <TextBox x:Name="ID" Text="{Binding ID, Mode=TwoWay}"  Margin="0 0 0 8"  />
@@ -244,6 +244,7 @@
             <ComboBox x:Name="OpeationStatus" SelectedValuePath="Content" Text="{Binding OpeationStatus, Mode=TwoWay}" Margin="0 0 0 8"  >
                 <ComboBoxItem Content="Normal"/>
                 <ComboBoxItem Content="Stuck"/>
+                <ComboBoxItem Content="Standby"/>
             </ComboBox>
         </StackPanel>
         <!--Manufacturer-->

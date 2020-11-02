@@ -6,9 +6,9 @@ namespace ExcelSqlDataExchange
         public int id { get; set; }
         #region  General
         public string equipmentId { get; set; }
-        public string equimentName { get; set; }
+        public string equipmentName { get; set; }
+        public string equipmentSystem { get; set; }
         public string equipmentType { get; set; }
-        public string barCode { get; set; }
 
         #endregion
 

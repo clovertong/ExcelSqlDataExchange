@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace ExcelSqlDataExchange.ViewModel
 {
-    public class UpdateDataViewModel : ModelView
+    public class UpdateDataViewModel : ModelView, IRequireViewIdentification
     {
         public ModelView modelView { get; set; }
 
@@ -400,11 +400,22 @@ namespace ExcelSqlDataExchange.ViewModel
         }
         #endregion
 
+        #region Window
+        private Guid _viewId;
+
+        public Guid ViewID
+        {
+            get { return _viewId; }
+        }
+
+        #endregion
+
         public UpdateDataViewModel()
         {
             modelView = new ModelView();
             Import = new DelegateCommand(ImportAction);
             Run = new DelegateCommand(RunAction);
+            _viewId = Guid.NewGuid();
         }
 
         private void ImportAction()
@@ -432,10 +443,12 @@ namespace ExcelSqlDataExchange.ViewModel
                 SelectSheet = string.Empty;
             }
             }
-            catch (Exception e)
+            catch (Exception a)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show(a.Message);
+                WindowManager.CloseWindow(ViewID);
                 throw;
+
             }
         }
 
@@ -444,25 +457,25 @@ namespace ExcelSqlDataExchange.ViewModel
             using (IDbConnection connection = new System.Data.SqlClient.SqlConnection(Helper.CnnVal("AssetDB")))
             {
                 var equipment=new Equipment {
-                    equipmentId = ID, equimentName = Name,  barCode = BarCode, equipmentType = Type,
-                    classification = Classification,materialType = MaterialType,consequencePriority = ConsequencePriority,opeationStatus = OpeationStatus,
+                    equipmentId = ID, equipmentName = Name,  equipmentSystem = BarCode, equipmentType = Type,
                     building = Building,floor = Level,room = Room,zone = Zone,
                     docLink = DocLink,docPhoto = DocPhotoLink,
+                    classification = Classification,materialType = MaterialType, consequencePriority = ConsequencePriority,opeationStatus = OpeationStatus,
                     manufacturer =Manufacturer,year=MM.ToShortDateString(),degradationInfo=DegradationInfo,detail=Detail,
                     inspectionStatus = Status,alarmType=AlarmType,collectedBy=CollectedBy,collectedOn=CollectedOn.ToShortDateString(),
                     notes=Notes,inspectionPhotoLink=InspectionPhotoLink,attachmentLink=AttachmentLink
                 };
                 Equipmentlist.Add(equipment);
                 connection.Execute(
-                    "dbo.EquipmentList_Insert " +
-                    "@equipmentId, @equimentName, @barCode, @equipmentType," +
-                    "@classification,@materialType," +
-                    "@consequencePriority,@opeationStatus," +
-                    "@building,@floor,@room,@zone," +
-                    "@docLink,@docPhoto," +
-                    "@manufacturer,@year,@degradationInfo,@detail," +
-                    "@inspectionStatus,@alarmType,@collectedBy," +
-                    "@collectedOn,@notes,@inspectionPhotoLink,@attachmentLink"
+                 "dbo.EquipmentList_Insert " +
+                 "@equipmentId, @equipmentName, @equipmentSystem, @equipmentType," +
+                 "@building,@floor,@room,@zone," +
+                 "@docLink,@docPhoto," +
+                 "@classification,@materialType," +
+                 "@consequencePriority,@opeationStatus," +
+                 "@manufacturer,@year,@degradationInfo,@detail," +
+                 "@inspectionStatus,@alarmType,@collectedBy," +
+                 "@collectedOn,@notes,@inspectionPhotoLink,@attachmentLink"
                     , Equipmentlist);
 
             }
@@ -477,11 +490,11 @@ namespace ExcelSqlDataExchange.ViewModel
             {
                 connection.Execute(
                  "dbo.EquipmentList_Insert " +
-                 "@equipmentId, @equimentName, @barCode, @equipmentType," +
+                 "@equipmentId, @equipmentName, @equipmentSystem, @equipmentType," +
+                 "@building,@floor,@room,@zone," +
+                 "@docLink,@docPhoto," +
                  "@classification,@materialType," +
                  "@consequencePriority,@opeationStatus," +
-                 "@docLink,@docPhoto," +
-                 "@building,@floor,@room,@zone," +
                  "@manufacturer,@year,@degradationInfo,@detail," +
                  "@inspectionStatus,@alarmType,@collectedBy," +
                  "@collectedOn,@notes,@inspectionPhotoLink,@attachmentLink"
@@ -522,20 +535,20 @@ namespace ExcelSqlDataExchange.ViewModel
                 string degradationInfo = xlsheet.Cell(i, 17).Value.ToString();
                 string detail = xlsheet.Cell(i, 18).Value.ToString();
 
-                string inspectionStatus = xlsheet.Cell(i, 15).Value.ToString();
-                string alarmType = xlsheet.Cell(i, 16).Value.ToString();
-                string collectedBy = xlsheet.Cell(i, 17).Value.ToString();
-                string collectedOn = xlsheet.Cell(i, 18).Value.ToString();
+                string inspectionStatus = xlsheet.Cell(i, 19).Value.ToString();
+                string alarmType = xlsheet.Cell(i, 20).Value.ToString();
+                string collectedBy = xlsheet.Cell(i, 21).Value.ToString();
+                string collectedOn = xlsheet.Cell(i, 22).Value.ToString();
 
-                string notes = xlsheet.Cell(i, 19).Value.ToString();
-                string inspectionPhotoLink = xlsheet.Cell(i, 20).Value.ToString();
-                string attachmentLink = xlsheet.Cell(i, 21).Value.ToString();
+                string notes = xlsheet.Cell(i, 23).Value.ToString();
+                string inspectionPhotoLink = xlsheet.Cell(i, 24).Value.ToString();
+                string attachmentLink = xlsheet.Cell(i, 25).Value.ToString();
 
                 var equipment=new Equipment
                 {
                     equipmentId = id,
-                    equimentName = equimentName,
-                    barCode = barCode,
+                    equipmentName = equimentName,
+                    equipmentSystem = barCode,
                     equipmentType = type,
                     classification = classification,
                     materialType = materialType,

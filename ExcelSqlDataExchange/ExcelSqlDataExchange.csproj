@@ -96,8 +96,10 @@
     <Compile Include="Form\UpdateTab.xaml.cs">
       <DependentUpon>UpdateTab.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Support\IRequireViewIdentification.cs" />
     <Compile Include="Support\Helper.cs" />
     <Compile Include="Support\VistalStyleFolderPicker.cs" />
+    <Compile Include="Support\WindowManager.cs" />
     <Compile Include="ViewModel\QueryViewModel.cs" />
     <Compile Include="ViewModel\UpdateDataViewModel.cs" />
     <Page Include="Form\QueryTab.xaml">
