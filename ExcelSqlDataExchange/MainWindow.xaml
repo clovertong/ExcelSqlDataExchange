@@ -88,7 +88,7 @@
             <Button Name="ExportBtn"  ToolTip="Clear all the content in the table" Style="{StaticResource RoundCorner}" Click="ResetOperation"  Focusable="False">
                 <DockPanel IsHitTestVisible="False">
                     <Image Source="Resources/clear-icon.png" Stretch="Uniform" Height="47" Width="41"/>
-                    <TextBlock  Margin=" 5 8 0 0"> Clear Database</TextBlock>
+                    <TextBlock  Margin=" 5 8 0 0"> Resest Database</TextBlock>
                 </DockPanel>
             </Button>
         </DockPanel>
